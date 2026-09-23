@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Food Corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+  :root{
+    --primary:#f5a623;
+    --primary-dark:#e0900f;
+    --dark:#1a1a1a;
+    --text:#2d2d2d;
+    --muted:#6b6b6b;
+    --bg-soft:#faf6ef;
+    --green:#2e9e5b;
+    --green-dark:#22803f;
+    --danger:#e0392b;
+    --danger-bg:#fdecea;
+    --success-bg:#e9f9ee;
+    --border:#e7e1d6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Poppins',sans-serif;color:var(--text);background:#fff;}
+  img{max-width:100%;display:block;object-fit:cover;}
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+  ul{list-style:none;}
+  .container{max-width:1280px;margin:0 auto;padding:0 24px;}
+
+  /* NAVBAR */
+  .navbar{
+    background:var(--dark);
+    color:#fff;
+    padding:16px 0;
+    position:sticky;top:0;z-index:50;
+  }
+  .navbar-inner{display:flex;align-items:center;justify-content:space-between;}
+  .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;}
+  .logo-icon{
+    background:var(--primary);
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;
+  }
+  .logo .accent{color:var(--primary);}
+  .logo-sub{font-size:11px;font-weight:400;color:#c9c9c9;display:block;margin-top:-2px;}
+  .nav-links{display:flex;align-items:center;gap:32px;}
+  .nav-links a{
+    font-weight:500;color:#e5e5e5;padding-bottom:4px;border-bottom:2px solid transparent;
+    transition:.2s;
+  }
+  .nav-links a:hover{color:var(--primary);}
+  .nav-links a.active{color:var(--primary);border-color:var(--primary);}
+  .cart-btn{position:relative;display:flex;align-items:center;gap:6px;background:transparent;color:#fff;font-size:20px;}
+  .cart-badge{
+    position:absolute;top:-8px;right:-10px;background:var(--primary);color:#1a1a1a;
+    font-size:11px;font-weight:700;border-radius:50%;width:18px;height:18px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nav-toggle{display:none;background:transparent;color:#fff;font-size:24px;}
+
+  @media (max-width:860px){
+    .nav-links{
+      position:absolute;top:100%;left:0;right:0;background:var(--dark);
+      flex-direction:column;align-items:flex-start;gap:0;
+      max-height:0;overflow:hidden;transition:max-height .25s ease;
+    }
+    .nav-links.open{max-height:400px;padding:8px 0;}
+    .nav-links a{width:100%;padding:12px 24px;border-bottom:1px solid #2a2a2a;}
+    .nav-toggle{display:block;}
+  }
+
+  /* HERO */
+  .hero{
+    position:relative;background:var(--dark);color:#fff;overflow:hidden;
+  }
+  .hero-inner{
+    display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:32px;
+    min-height:420px;padding:48px 24px;
+  }
+  .hero-img{border-radius:12px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4);}
+  .hero-img img{width:100%;height:380px;object-fit:cover;}
+  .eyebrow{color:var(--primary);font-weight:600;letter-spacing:2px;font-size:13px;margin-bottom:12px;}
+  .hero h1{font-size:42px;font-weight:800;line-height:1.2;margin-bottom:16px;}
+  .hero h1 .accent{color:var(--primary);}
+  .hero p{color:#d5d5d5;font-size:16px;margin-bottom:24px;max-width:440px;line-height:1.6;}
+  .btn-primary{
+    background:var(--primary);color:#1a1a1a;font-weight:700;padding:14px 28px;
+    border-radius:30px;display:inline-flex;align-items:center;gap:8px;font-size:15px;
+    transition:.2s;
+  }
+  .btn-primary:hover{background:var(--primary-dark);}
+  @media (max-width:860px){
+    .hero-inner{grid-template-columns:1fr;}
+    .hero h1{font-size:32px;}
+  }
+
+  /* SECTION HEADERS */
+  .section{padding:64px 0;}
+  .section-header{text-align:center;margin-bottom:40px;}
+  .section-tag{color:var(--primary);font-weight:700;letter-spacing:2px;font-size:13px;margin-bottom:8px;}
+  .section-header h2{font-size:32px;font-weight:800;margin-bottom:10px;}
+  .section-header p{color:var(--muted);max-width:520px;margin:0 auto;}
+
+  /* FOOD GRID */
+  .food-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px;
+  }
+  .food-card{
+    background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;
+    transition:.2s;display:flex;flex-direction:column;
+  }
+  .food-card:hover{box-shadow:0 12px 30px rgba(0,0,0,.08);transform:translateY(-3px);}
+  .food-card img{width:100%;height:170px;}
+  .food-card-body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .food-cat-tag{
+    display:inline-block;background:#eaf7ef;color:var(--green-dark);font-size:11px;font-weight:600;
+    padding:3px 10px;border-radius:20px;width:fit-content;
+  }
+  .food-name{font-weight:600;font-size:16px;}
+  .food-price{color:var(--primary-dark);font-weight:700;font-size:15px;}
+  .btn-order{
+    margin-top:auto;background:var(--primary);color:#1a1a1a;font-weight:600;padding:10px;
+    border-radius:8px;width:100%;font-size:14px;transition:.2s;
+  }
+  .btn-order:hover{background:var(--primary-dark);}
+  .btn-order:disabled{background:#c9c9c9;color:#666;cursor:not-allowed;}
+
+  /* FEATURES */
+  .features{background:var(--bg-soft);padding:40px 0;}
+  .features-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;text-align:center;
+  }
+  .feature-icon{font-size:28px;margin-bottom:10px;}
+  .feature-title{font-weight:700;margin-bottom:4px;}
+  .feature-sub{color:var(--muted);font-size:14px;}
+
+  /* MENU PAGE */
+  .menu-hero{
+    background:var(--dark);color:#fff;padding:56px 24px;position:relative;
+  }
+  .menu-hero-inner{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;}
+  .menu-hero h1{font-size:40px;font-weight:800;}
+  .menu-hero .accent{color:var(--primary);}
+  .menu-hero p{color:#d5d5d5;margin:14px 0 22px;max-width:420px;line-height:1.6;}
+  .menu-hero-img img{border-radius:12px;height:260px;width:100%;object-fit:cover;}
+  @media (max-width:860px){.menu-hero-inner{grid-template-columns:1fr;}}
+
+  .menu-layout{
+    display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start;padding:40px 0;
+  }
+  @media (max-width:1000px){.menu-layout{grid-template-columns:1fr;}}
+
+  .menu-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:24px;}
+  .search-box{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:30px;
+    padding:10px 18px;flex:1;min-width:220px;background:#fff;
+  }
+  .search-box input{border:none;outline:none;flex:1;font-size:14px;font-family:inherit;}
+  .filter-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{
+    padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:#fff;
+    font-weight:600;font-size:13px;color:var(--text);transition:.2s;
+  }
+  .chip.active{background:var(--green);color:#fff;border-color:var(--green);}
+  .chip:hover:not(.active){border-color:var(--green);}
+
+  .no-results{
+    text-align:center;padding:60px 20px;color:var(--muted);
+    background:var(--bg-soft);border-radius:12px;
+  }
+  .no-results .emoji{font-size:40px;margin-bottom:12px;}
+
+  /* CART / ORDER PANEL */
+  .cart-panel{
+    background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;
+    position:sticky;top:90px;
+  }
+  .cart-panel h3{display:flex;align-items:center;gap:8px;font-size:18px;margin-bottom:16px;}
+  .cart-count-badge{
+    background:var(--primary);color:#1a1a1a;font-size:12px;font-weight:700;
+    border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;
+  }
+  .cart-line{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .cart-line img{width:48px;height:48px;border-radius:8px;flex-shrink:0;}
+  .cart-line-info{flex:1;min-width:0;}
+  .cart-line-name{font-weight:600;font-size:14px;}
+  .cart-line-price{color:var(--muted);font-size:13px;}
+  .qty-control{display:flex;align-items:center;gap:6px;}
+  .qty-btn{
+    width:24px;height:24px;border-radius:6px;background:var(--bg-soft);border:1px solid var(--border);
+    font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;
+  }
+  .qty-btn.plus{background:var(--primary);color:#1a1a1a;border-color:var(--primary);}
+  .cart-total-row{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:16px;margin:16px 0;}
+  .btn-checkout{
+    width:100%;background:var(--green);color:#fff;font-weight:700;padding:13px;border-radius:8px;font-size:14px;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;
+  }
+  .btn-checkout:hover{background:var(--green-dark);}
+  .btn-checkout:disabled{background:#c9c9c9;cursor:not-allowed;}
+  .empty-cart-msg{
+    text-align:center;padding:28px 12px;color:var(--muted);font-size:14px;
+  }
+  .empty-cart-msg .emoji{font-size:32px;display:block;margin-bottom:8px;}
+
+  /* ORDER PAGE FULL LIST */
+  .order-page-layout{display:grid;grid-template-columns:1fr 380px;gap:28px;padding:40px 0;align-items:start;}
+  @media (max-width:1000px){.order-page-layout{grid-template-columns:1fr;}}
+  .order-list-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;}
+  .order-row{
+    display:grid;grid-template-columns:64px 1fr auto auto auto;gap:14px;align-items:center;
+    padding:14px 0;border-bottom:1px solid var(--border);
+  }
+  .order-row img{width:64px;height:64px;border-radius:10px;}
+  .order-row-name{font-weight:600;}
+  .order-row-cat{color:var(--muted);font-size:12px;}
+  .order-row-price{color:var(--primary-dark);font-weight:600;font-size:13px;}
+  .order-row-total{font-weight:700;}
+  .btn-edit, .btn-delete{
+    padding:7px 12px;border-radius:6px;font-size:13px;font-weight:600;
+  }
+  .btn-edit{background:var(--bg-soft);border:1px solid var(--border);}
+  .btn-delete{background:var(--danger-bg);color:var(--danger);}
+  .btn-edit:hover{background:#eee;}
+  .btn-delete:hover{background:#fbdcd8;}
+  .edit-qty-inline{display:flex;align-items:center;gap:6px;}
+  .continue-shopping{
+    display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--primary-dark);
+    border:1px solid var(--primary);padding:10px 18px;border-radius:30px;margin-top:16px;
+  }
+
+  .order-summary-card{background:var(--bg-soft);border-radius:14px;padding:20px;position:sticky;top:90px;}
+  .summary-row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;border-bottom:1px dashed var(--border);}
+  .help-box{
+    margin-top:16px;background:var(--danger-bg);border-radius:10px;padding:16px;font-size:13px;color:#7a2a20;
+  }
+  .help-box a{color:var(--danger);font-weight:700;}
+
+  /* FORMS */
+  .form-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-weight:600;font-size:14px;margin-bottom:6px;}
+  .form-group input, .form-group textarea{
+    width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:8px;
+    font-family:inherit;font-size:14px;outline:none;transition:.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus{border-color:var(--primary);}
+  .form-group input.invalid, .form-group textarea.invalid{border-color:var(--danger);background:#fff7f6;}
+  .field-error{color:var(--danger);font-size:12px;margin-top:4px;}
+  .alert{padding:14px 16px;border-radius:10px;font-size:14px;margin-top:12px;display:flex;gap:10px;align-items:flex-start;}
+  .alert-success{background:var(--success-bg);color:var(--green-dark);}
+  .alert-error{background:var(--danger-bg);color:#a62c20;}
+
+  /* ABOUT PAGE */
+  .about-hero{
+    background:var(--dark);color:#fff;padding:60px 24px;position:relative;
+  }
+  .about-hero .crumb{color:#bbb;font-size:13px;margin-bottom:14px;}
+  .about-hero .crumb .accent{color:var(--primary);}
+  .about-hero h1{font-size:42px;font-weight:800;}
+  .about-hero h1 .accent{color:var(--primary);}
+  .about-hero p{color:#d5d5d5;margin-top:8px;}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:60px 0;}
+  @media (max-width:860px){.about-grid{grid-template-columns:1fr;}}
+  .about-grid img{border-radius:12px;height:340px;width:100%;object-fit:cover;}
+  .about-tag{color:var(--primary);font-weight:700;letter-spacing:2px;font-size:13px;margin-bottom:8px;}
+  .about-grid h2{font-size:30px;font-weight:800;margin-bottom:14px;}
+  .about-grid p{color:var(--muted);line-height:1.7;margin-bottom:14px;}
+  .about-values{background:var(--bg-soft);padding:36px 0;}
+  .values-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;}
+  .value-item{display:flex;gap:14px;align-items:flex-start;}
+  .value-icon{
+    background:var(--primary);color:#1a1a1a;width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+  }
+  .value-item h4{font-weight:700;margin-bottom:4px;}
+  .value-item p{color:var(--muted);font-size:13px;}
+  .team-section{padding:60px 0;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;}
+  @media (max-width:860px){.team-section{grid-template-columns:1fr;}}
+  .team-photo{display:flex;gap:20px;align-items:center;}
+  .team-photo img{width:150px;height:190px;border-radius:12px;object-fit:cover;}
+  .quote-box{font-style:italic;color:var(--muted);border-left:3px solid var(--primary);padding-left:16px;}
+
+  /* CONTACT PAGE */
+  .contact-hero{background:var(--dark);color:#fff;padding:56px 24px;}
+  .contact-hero h1{font-size:40px;font-weight:800;}
+  .contact-hero .accent{color:var(--primary);}
+  .contact-hero p{color:#d5d5d5;margin-top:10px;max-width:520px;}
+  .contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:50px 0;align-items:start;}
+  @media (max-width:900px){.contact-layout{grid-template-columns:1fr;}}
+  .contact-info-item{display:flex;gap:14px;margin-bottom:22px;}
+  .contact-icon{
+    background:var(--primary);color:#1a1a1a;width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  }
+  .contact-info-item h4{font-weight:700;margin-bottom:3px;}
+  .contact-info-item p{color:var(--muted);font-size:14px;line-height:1.5;}
+  .map-box{
+    margin-top:20px;border-radius:12px;overflow:hidden;border:1px solid var(--border);
+    height:220px;background:linear-gradient(135deg,#eef2ea,#e4ece0);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--muted);
+    position:relative;
+  }
+  .map-pin{color:var(--danger);font-weight:700;display:flex;align-items:center;gap:6px;font-size:14px;}
+  .social-row{display:flex;gap:12px;margin-top:18px;}
+  .social-icon{
+    width:38px;height:38px;border-radius:50%;background:var(--dark);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:15px;
+  }
+
+  /* FOOTER */
+  .footer{background:var(--dark);color:#ccc;padding:32px 0;margin-top:0;}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;}
+  .footer-links{display:flex;gap:18px;flex-wrap:wrap;}
+  .footer-links a{color:#ccc;font-size:14px;}
+  .footer-links a:hover{color:var(--primary);}
+  .footer-bottom{text-align:center;font-size:13px;color:#888;margin-top:20px;border-top:1px solid #2a2a2a;padding-top:16px;}
+
+  .page-fade{animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+/* ============================
+   DATA (Array / JSON source)
+   ============================ */
+const FOOD_ITEMS = [
+  // Starters
+  { id: 1, name: "French Fries", category: "Starters", price: 100, img: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80" },
+  { id: 2, name: "Cheese Fries", category: "Starters", price: 150, img: "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=500&q=80" },
+  { id: 3, name: "Garlic Bread", category: "Starters", price: 120, img: "https://images.unsplash.com/photo-1619535860434-ba1d8fa7c34c?w=500&q=80" },
+  { id: 4, name: "Nachos", category: "Starters", price: 160, img: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=500&q=80" },
+  { id: 5, name: "Potato Wedges", category: "Starters", price: 120, img: "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=500&q=80" },
+  { id: 6, name: "Chicken Wings", category: "Starters", price: 220, img: "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=500&q=80" },
+  { id: 7, name: "Spring Rolls", category: "Starters", price: 140, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80" },
+  { id: 8, name: "Tomato Soup", category: "Starters", price: 110, img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80" },
+
+  // Main Course
+  { id: 9,  name: "Margherita Pizza", category: "Main Course", price: 220, img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=500&q=80" },
+  { id: 10, name: "Cheese Pizza", category: "Main Course", price: 240, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80" },
+  { id: 11, name: "Veg Pizza", category: "Main Course", price: 260, img: "https://images.unsplash.com/photo-1548369937-47519962c11a?w=500&q=80" },
+  { id: 12, name: "Paneer Pizza", category: "Main Course", price: 280, img: "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=500&q=80" },
+  { id: 13, name: "Veg Burger", category: "Main Course", price: 120, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80" },
+  { id: 14, name: "Cheese Burger", category: "Main Course", price: 150, img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=500&q=80" },
+  { id: 15, name: "Chicken Burger", category: "Main Course", price: 180, img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=500&q=80" },
+  { id: 16, name: "Alfredo Pasta", category: "Main Course", price: 180, img: "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=500&q=80" },
+  { id: 17, name: "Red Sauce Pasta", category: "Main Course", price: 170, img: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=500&q=80" },
+  { id: 18, name: "Mac & Cheese", category: "Main Course", price: 190, img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80" },
+
+  // Desserts
+  { id: 19, name: "Brownie", category: "Desserts", price: 110, img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&q=80" },
+  { id: 20, name: "Chocolate Cake", category: "Desserts", price: 160, img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&q=80" },
+  { id: 21, name: "Ice Cream", category: "Desserts", price: 90,  img: "https://images.unsplash.com/photo-1567206563064-6f60f40a2b57?w=500&q=80" },
+  { id: 22, name: "Donut", category: "Desserts", price: 80,  img: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=500&q=80" },
+  { id: 23, name: "Cheesecake", category: "Desserts", price: 180, img: "https://images.unsplash.com/photo-1524351199678-941a58a3df50?w=500&q=80" },
+  { id: 24, name: "Brownie with Ice Cream", category: "Desserts", price: 150, img: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=500&q=80" },
+
+  // Beverages
+  { id: 25, name: "Coke", category: "Beverages", price: 60,  img: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=500&q=80" },
+  { id: 26, name: "Sprite", category: "Beverages", price: 60,  img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
+  { id: 27, name: "Cold Coffee", category: "Beverages", price: 120, img: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=500&q=80" },
+  { id: 28, name: "Lemonade", category: "Beverages", price: 90,  img: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=500&q=80" },
+  { id: 29, name: "Iced Tea", category: "Beverages", price: 100, img: "https://images.unsplash.com/photo-1499638673689-79a0b5115d87?w=500&q=80" },
+  { id: 30, name: "Milkshake", category: "Beverages", price: 130, img: "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=500&q=80" },
+  { id: 31, name: "Fresh Lime Soda", category: "Beverages", price: 80,  img: "https://images.unsplash.com/photo-1601924582970-9238bcb495d9?w=500&q=80" },
+  { id: 32, name: "Orange Juice", category: "Beverages", price: 90,  img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=500&q=80" },
+];
+
+const POPULAR_IDS = [13, 9, 16, 24]; // Veg Burger, Margherita Pizza, Alfredo Pasta, Brownie with Ice Cream
+
+const CATEGORIES = ["All", "Starters", "Main Course", "Desserts", "Beverages"];
+
+/* ============================
+   Reusable / small components
+   ============================ */
+
+function Navbar({ page, setPage, cartCount }) {
+  const [open, setOpen] = useState(false);
+  const links = [
+    { key: "home", label: "Home" },
+    { key: "menu", label: "Menu" },
+    { key: "about", label: "About" },
+    { key: "contact", label: "Contact" },
+    { key: "order", label: "Order" },
+  ];
+
+  function go(key) {
+    setPage(key);
+    setOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  return (
+    <header className="navbar">
+      <div className="container navbar-inner">
+        <div className="logo" onClick={() => go("home")} style={{ cursor: "pointer" }}>
+          <span className="logo-icon">🍴</span>
+          <span>
+            Food <span className="accent">Corner</span>
+            <span className="logo-sub">Your Cravings, Our Passion</span>
+          </span>
+        </div>
+
+        <nav className={"nav-links" + (open ? " open" : "")}>
+          {links.map((l) => (
+            <a
+              key={l.key}
+              className={page === l.key ? "active" : ""}
+              onClick={() => go(l.key)}
+            >
+              {l.label}
+            </a>
+          ))}
+        </nav>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <button className="cart-btn" onClick={() => go("order")} aria-label="Cart">
+            🛒
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+          </button>
+          <button className="nav-toggle" onClick={() => setOpen(!open)}>
+            {open ? "✕" : "☰"}
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Footer({ setPage }) {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-inner">
+          <div className="logo" style={{ fontSize: 18 }}>
+            <span className="logo-icon">🍴</span>
+            <span>Food <span className="accent">Corner</span></span>
+          </div>
+          <div className="footer-links">
+            <a onClick={() => setPage("home")}>Home</a>
+            <a onClick={() => setPage("menu")}>Menu</a>
+            <a onClick={() => setPage("about")}>About</a>
+            <a onClick={() => setPage("contact")}>Contact</a>
+            <a onClick={() => setPage("order")}>Order</a>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <span className="social-icon">📘</span>
+            <span className="social-icon">📷</span>
+            <span className="social-icon">▶️</span>
+          </div>
+        </div>
+        <div className="footer-bottom">© 2026 Food Corner. All rights reserved. — Good Food. Good Mood. ❤️</div>
+      </div>
+    </footer>
+  );
+}
+
+// FoodCard: reusable component driven entirely by props
+function FoodCard({ item, onAdd, inCart }) {
+  return (
+    <div className="food-card">
+      <img src={item.img} alt={item.name} loading="lazy" />
+      <div className="food-card-body">
+        <span className="food-cat-tag">{item.category}</span>
+        <div className="food-name">{item.name}</div>
+        <div className="food-price">₹ {item.price}</div>
+        <button className="btn-order" onClick={() => onAdd(item)}>
+          {inCart ? `Add More (${inCart})` : "Add to Order"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ============================
+   HOME PAGE
+   ============================ */
+function Home({ setPage, cart, addToCart }) {
+  const popularItems = FOOD_ITEMS.filter((f) => POPULAR_IDS.includes(f.id));
+
+  return (
+    <div className="page-fade">
+      <section className="hero">
+        <div className="container hero-inner">
+          <div>
+            <div className="eyebrow">WELCOME TO FOOD CORNER</div>
+            <h1>
+              Good Food Brings People <span className="accent">Together</span>
+            </h1>
+            <p>
+              Fresh ingredients, great taste and a cozy atmosphere. Enjoy your
+              favorite food, always!
+            </p>
+            <button className="btn-primary" onClick={() => setPage("menu")}>
+              Explore Menu →
+            </button>
+          </div>
+          <div className="hero-img">
+            <img
+              src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=900&q=80"
+              alt="Delicious pizza"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-tag">POPULAR DISHES</div>
+            <h2>Our Special Menu</h2>
+            <p>Discover our most loved dishes, made with fresh ingredients and a lot of love.</p>
+          </div>
+          <div className="food-grid">
+            {popularItems.map((item) => (
+              <FoodCard
+                key={item.id}
+                item={item}
+                onAdd={addToCart}
+                inCart={cart[item.id] ? cart[item.id].qty : 0}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="features">
+        <div className="container features-grid">
+          <div>
+            <div className="feature-icon">🌿</div>
+            <div className="feature-title">Fresh Ingredients</div>
+            <div className="feature-sub">Always fresh & high quality</div>
+          </div>
+          <div>
+            <div className="feature-icon">👨‍🍳</div>
+            <div className="feature-title">Expert Chefs</div>
+            <div className="feature-sub">Prepared with love</div>
+          </div>
+          <div>
+            <div className="feature-icon">🚚</div>
+            <div className="feature-title">Fast Service</div>
+            <div className="feature-sub">Fresh food, on time</div>
+          </div>
+          <div>
+            <div className="feature-icon">❤️</div>
+            <div className="feature-title">Happy Customers</div>
+            <div className="feature-sub">Your satisfaction matters</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ============================
+   MENU PAGE
+   ============================ */
+function Menu({ setPage, cart, addToCart }) {
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+
+  // Filtered list using array methods (filter + includes)
+  const filteredItems = useMemo(() => {
+    return FOOD_ITEMS.filter((item) => {
+      const matchesCategory = category === "All" || item.category === category;
+      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [search, category]);
+
+  return (
+    <div className="page-fade">
+      <section className="menu-hero">
+        <div className="container menu-hero-inner">
+          <div>
+            <div className="eyebrow">WELCOME TO</div>
+            <h1>
+              Food <span className="accent">Corner</span>
+            </h1>
+            <p>
+              Delicious food, fresh ingredients, and great vibes. Explore our
+              menu and enjoy the best flavors in town!
+            </p>
+            <button className="btn-primary" onClick={() => setPage("order")}>
+              Order Now →
+            </button>
+          </div>
+          <div className="menu-hero-img">
+            <img
+              src="https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=800&q=80"
+              alt="Menu hero"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="container menu-layout">
+        <div>
+          <div className="menu-toolbar">
+            <div className="search-box">
+              <span>🔍</span>
+              <input
+                type="text"
+                placeholder="Search for a dish..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="filter-chips">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  className={"chip" + (category === cat ? " active" : "")}
+                  onClick={() => setCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Conditional rendering: no-results message */}
+          {filteredItems.length === 0 ? (
+            <div className="no-results">
+              <div className="emoji">🍽️</div>
+              <h3>No dishes found</h3>
+              <p>Try a different search term or category.</p>
+            </div>
+          ) : (
+            <div className="food-grid">
+              {filteredItems.map((item) => (
+                <FoodCard
+                  key={item.id}
+                  item={item}
+                  onAdd={addToCart}
+                  inCart={cart[item.id] ? cart[item.id].qty : 0}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <CartPanel cart={cart} setPage={setPage} compact />
+      </div>
+    </div>
+  );
+}
+
+/* ============================
+   CART / ORDER PANEL (sidebar used on Menu page)
+   ============================ */
+function CartPanel({ cart, setPage }) {
+  const items = Object.values(cart);
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const count = items.reduce((sum, i) => sum + i.qty, 0);
+
+  return (
+    <div className="cart-panel">
+      <h3>
+        🛒 Your Order {count > 0 && <span className="cart-count-badge">{count}</span>}
+      </h3>
+
+      {items.length === 0 ? (
+        <div className="empty-cart-msg">
+          <span className="emoji">🛍️</span>
+          Your order is empty.
+          <br />
+          Add some delicious items to get started!
+        </div>
+      ) : (
+        <React.Fragment>
+          {items.map((item) => (
+            <div className="cart-line" key={item.id}>
+              <img src={item.img} alt={item.name} />
+              <div className="cart-line-info">
+                <div className="cart-line-name">{item.name}</div>
+                <div className="cart-line-price">₹ {item.price} × {item.qty}</div>
+              </div>
+            </div>
+          ))}
+          <div className="cart-total-row">
+            <span>Total</span>
+            <span>₹ {total}</span>
+          </div>
+        </React.Fragment>
+      )}
+
+      <button
+        className="btn-checkout"
+        disabled={items.length === 0}
+        onClick={() => setPage("order")}
+      >
+        Proceed to Order →
+      </button>
+    </div>
+  );
+}
+
+/* ============================
+   ORDER PAGE (full cart + checkout form)
+   ============================ */
+function OrderPage({ setPage, cart, updateQty, removeItem }) {
+  const items = Object.values(cart);
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const [editingId, setEditingId] = useState(null);
+  const [editQty, setEditQty] = useState(1);
+
+  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "" });
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [showGeneralError, setShowGeneralError] = useState(false);
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setSubmitted(false);
+    setShowGeneralError(false);
+  }
+
+  function validate() {
+    const newErrors = {};
+    if (!form.name.trim()) newErrors.name = "Name is required.";
+    if (!form.phone.trim()) {
+      newErrors.phone = "Phone number is required.";
+    } else if (!/^[0-9]{10}$/.test(form.phone.trim())) {
+      newErrors.phone = "Enter a valid 10-digit phone number.";
+    }
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      newErrors.email = "Enter a valid email address.";
+    }
+    if (!form.address.trim()) newErrors.address = "Address is required.";
+    return newErrors;
+  }
+
+  function handlePlaceOrder(e) {
+    e.preventDefault();
+    const newErrors = validate();
+    setErrors(newErrors);
+
+    if (items.length === 0 || Object.keys(newErrors).length > 0) {
+      setShowGeneralError(true);
+      setSubmitted(false);
+      return;
+    }
+
+    setShowGeneralError(false);
+    setSubmitted(true);
+  }
+
+  function startEdit(item) {
+    setEditingId(item.id);
+    setEditQty(item.qty);
+  }
+
+  function saveEdit(id) {
+    updateQty(id, Math.max(1, Number(editQty) || 1));
+    setEditingId(null);
+  }
+
+  return (
+    <div className="page-fade">
+      <section className="menu-hero">
+        <div className="container menu-hero-inner">
+          <div>
+            <div className="eyebrow">YOUR ORDER</div>
+            <h1>
+              Food <span className="accent">Corner</span>
+            </h1>
+            <p>Good food, good mood! Check your selected items and make your order special.</p>
+          </div>
+          <div className="menu-hero-img">
+            <img
+              src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80"
+              alt="Order hero"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="container order-page-layout">
+        <div>
+          <div className="order-list-card">
+            <h3 style={{ marginBottom: 16 }}>🛒 Your Order ({items.length} items)</h3>
+
+            {items.length === 0 ? (
+              <div className="empty-cart-msg">
+                <span className="emoji">🛍️</span>
+                Your order is empty. Add some delicious items from our menu to get started.
+              </div>
+            ) : (
+              items.map((item) => (
+                <div className="order-row" key={item.id}>
+                  <img src={item.img} alt={item.name} />
+                  <div>
+                    <div className="order-row-name">{item.name}</div>
+                    <div className="order-row-cat">{item.category}</div>
+                    <div className="order-row-price">₹ {item.price}</div>
+                  </div>
+
+                  {editingId === item.id ? (
+                    <div className="edit-qty-inline">
+                      <button className="qty-btn" onClick={() => setEditQty((q) => Math.max(1, q - 1))}>−</button>
+                      <span>{editQty}</span>
+                      <button className="qty-btn plus" onClick={() => setEditQty((q) => q + 1)}>+</button>
+                    </div>
+                  ) : (
+                    <div className="qty-control">
+                      <button className="qty-btn" onClick={() => updateQty(item.id, Math.max(1, item.qty - 1))}>−</button>
+                      <span>{item.qty}</span>
+                      <button className="qty-btn plus" onClick={() => updateQty(item.id, item.qty + 1)}>+</button>
+                    </div>
+                  )}
+
+                  <div className="order-row-total">₹ {item.price * item.qty}</div>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {editingId === item.id ? (
+                      <button className="btn-edit" onClick={() => saveEdit(item.id)}>Save</button>
+                    ) : (
+                      <button className="btn-edit" onClick={() => startEdit(item)}>✏️ Edit</button>
+                    )}
+                    <button className="btn-delete" onClick={() => removeItem(item.id)}>🗑️ Delete</button>
+                  </div>
+                </div>
+              ))
+            )}
+
+            <button className="continue-shopping" onClick={() => setPage("menu")}>
+              ← Continue Shopping
+            </button>
+          </div>
+
+          {/* CUSTOMER DETAILS / CHECKOUT FORM */}
+          <div className="form-card" style={{ marginTop: 24 }}>
+            <h3 style={{ marginBottom: 16 }}>👤 Customer Details</h3>
+            <form onSubmit={handlePlaceOrder} noValidate>
+              <div className="form-group">
+                <label>Full Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className={errors.name ? "invalid" : ""}
+                />
+                {errors.name && <div className="field-error">{errors.name}</div>}
+              </div>
+
+              <div className="form-group">
+                <label>Phone Number *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Enter your phone number"
+                  value={form.phone}
+                  onChange={handleChange}
+                  className={errors.phone ? "invalid" : ""}
+                />
+                {errors.phone && <div className="field-error">{errors.phone}</div>}
+              </div>
+
+              <div className="form-group">
+                <label>Email Address *</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className={errors.email ? "invalid" : ""}
+                />
+                {errors.email && <div className="field-error">{errors.email}</div>}
+              </div>
+
+              <div className="form-group">
+                <label>Address *</label>
+                <textarea
+                  name="address"
+                  rows="3"
+                  placeholder="Enter your address"
+                  value={form.address}
+                  onChange={handleChange}
+                  className={errors.address ? "invalid" : ""}
+                ></textarea>
+                {errors.address && <div className="field-error">{errors.address}</div>}
+              </div>
+
+              <button type="submit" className="btn-checkout" style={{ background: "var(--primary)", color: "#1a1a1a" }}>
+                💳 Place Order
+              </button>
+
+              {/* Conditional messages */}
+              {submitted && (
+                <div className="alert alert-success">
+                  ✅ Order placed successfully! Thank you for ordering from Food Corner.
+                </div>
+              )}
+              {showGeneralError && (
+                <div className="alert alert-error">
+                  ⚠️ Please fill all required fields correctly{items.length === 0 ? " and add at least one item to your order." : "."}
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+
+        <div className="order-summary-card">
+          <h3 style={{ marginBottom: 14 }}>📋 Order Summary</h3>
+          {items.length === 0 ? (
+            <p style={{ color: "var(--muted)", fontSize: 14 }}>No items yet.</p>
+          ) : (
+            items.map((item) => (
+              <div className="summary-row" key={item.id}>
+                <span>{item.name} ({item.qty})</span>
+                <span>₹ {item.price * item.qty}</span>
+              </div>
+            ))
+          )}
+          <div className="cart-total-row">
+            <span>Total Amount</span>
+            <span>₹ {total}</span>
+          </div>
+
+          <div className="help-box">
+            <strong>Need Help?</strong>
+            <p style={{ marginTop: 6 }}>
+              If you have any special requests or food allergies, feel free to contact us.
+            </p>
+            <p style={{ marginTop: 6 }}>📞 <a href="tel:+919876543210">+91 98765 43210</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================
+   ABOUT PAGE
+   ============================ */
+function About({ setPage }) {
+  const values = [
+    { icon: "🌿", title: "Fresh Ingredients", desc: "We use only the freshest and finest ingredients." },
+    { icon: "👨‍🍳", title: "Expert Chefs", desc: "Our chefs bring passion and creativity to every dish." },
+    { icon: "🤝", title: "Friendly Atmosphere", desc: "A cozy place for family, friends and food lovers." },
+    { icon: "❤️", title: "Customer Satisfaction", desc: "Your happiness is our top priority." },
+  ];
+
+  return (
+    <div className="page-fade">
+      <section className="about-hero">
+        <div className="container">
+          <div className="crumb">Home &gt; <span className="accent">About</span></div>
+          <h1>
+            About <span className="accent">Us</span>
+          </h1>
+          <p>Good Food • Good Vibes • Together</p>
+        </div>
+      </section>
+
+      <div className="container">
+        <div className="about-grid">
+          <div>
+            <div className="about-tag">OUR STORY</div>
+            <h2>Welcome to Food Corner</h2>
+            <p>
+              At Food Corner, we believe that great food brings people together.
+              Our journey started with a simple idea — to serve delicious, fresh
+              and high-quality food in a warm and friendly atmosphere.
+            </p>
+            <p>
+              From classic favorites to new flavors, we prepare every dish with
+              care and the finest ingredients. Whether you're here for a quick
+              bite, a family dinner, or a special celebration, we're happy to be
+              a part of your moments.
+            </p>
+            <button className="btn-primary" onClick={() => setPage("menu")}>
+              Explore Our Menu →
+            </button>
+          </div>
+          <img
+            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80"
+            alt="Restaurant table with burger"
+          />
+        </div>
+      </div>
+
+      <section className="about-values">
+        <div className="container values-grid">
+          {values.map((v, idx) => (
+            <div className="value-item" key={idx}>
+              <div className="value-icon">{v.icon}</div>
+              <div>
+                <h4>{v.title}</h4>
+                <p>{v.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="container">
+        <div className="team-section">
+          <div className="team-photo">
+            <img
+              src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=500&q=80"
+              alt="Chef"
+            />
+            <div>
+              <div className="about-tag">OUR TEAM</div>
+              <h3 style={{ fontSize: 24, marginBottom: 8 }}>Passionate People, Great Food</h3>
+              <p style={{ color: "var(--muted)", lineHeight: 1.6 }}>
+                Our team is made up of skilled chefs, friendly service staff and
+                food lovers who work together to give you the best dining
+                experience.
+              </p>
+            </div>
+          </div>
+          <div className="quote-box">
+            "Food is not just what we serve, it's what we share."
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================
+   CONTACT PAGE
+   ============================ */
+function Contact() {
+  const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState(null); // null | "success" | "error"
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setStatus(null);
+  }
+
+  function validate() {
+    const newErrors = {};
+    if (!form.name.trim()) newErrors.name = "Name is required.";
+    if (!form.phone.trim()) {
+      newErrors.phone = "Phone number is required.";
+    } else if (!/^[0-9]{10}$/.test(form.phone.trim())) {
+      newErrors.phone = "Enter a valid 10-digit phone number.";
+    }
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      newErrors.email = "Enter a valid email address.";
+    }
+    if (!form.message.trim()) newErrors.message = "Message is required.";
+    return newErrors;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const newErrors = validate();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setStatus("error");
+      return;
+    }
+
+    setStatus("success");
+    setForm({ name: "", phone: "", email: "", message: "" });
+  }
+
+  const infoList = [
+    { icon: "📍", title: "Our Address", lines: ["123 Food Corner Street,", "Ahmedabad, Gujarat - 380001"] },
+    { icon: "📞", title: "Phone", lines: ["+91 98765 43210", "(Mon - Sun: 10:00 AM - 11:00 PM)"] },
+    { icon: "✉️", title: "Email", lines: ["hello@foodcorner.com", "(We reply within 24 hours)"] },
+    { icon: "🕒", title: "Opening Hours", lines: ["Monday - Sunday", "10:00 AM - 11:00 PM"] },
+  ];
+
+  return (
+    <div className="page-fade">
+      <section className="contact-hero">
+        <div className="container">
+          <div className="eyebrow">GET IN TOUCH</div>
+          <h1>
+            Contact <span className="accent">Us</span>
+          </h1>
+          <p>
+            We'd love to hear from you! Whether you have a question, feedback,
+            or just want to say hello, we're here for you.
+          </p>
+        </div>
+      </section>
+
+      <div className="container contact-layout">
+        <div>
+          <h2 style={{ marginBottom: 6 }}>Our Contact Information</h2>
+          <p style={{ color: "var(--muted)", marginBottom: 24 }}>
+            Find us, give us a call, or drop us an email. We're always happy to help!
+          </p>
+
+          {infoList.map((info, idx) => (
+            <div className="contact-info-item" key={idx}>
+              <div className="contact-icon">{info.icon}</div>
+              <div>
+                <h4>{info.title}</h4>
+                {info.lines.map((line, i) => (
+                  <p key={i}>{line}</p>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="map-box">
+            <div className="map-pin">📍 Food Corner — Ahmedabad, Gujarat</div>
+            <p style={{ fontSize: 13, marginTop: 6 }}>Juhapura • Sarkhej Rd • Juhapura Rd</p>
+          </div>
+
+          <div className="social-row">
+            <span className="social-icon">📘</span>
+            <span className="social-icon">📷</span>
+            <span className="social-icon">▶️</span>
+          </div>
+        </div>
+
+        <div className="form-card">
+          <h3 style={{ marginBottom: 4 }}>Send Us a Message</h3>
+          <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 18 }}>
+            Fill out the form below and we'll get back to you soon.
+          </p>
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="form-group">
+              <label>Your Name *</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                value={form.name}
+                onChange={handleChange}
+                className={errors.name ? "invalid" : ""}
+              />
+              {errors.name && <div className="field-error">{errors.name}</div>}
+            </div>
+            <div className="form-group">
+              <label>Your Phone Number *</label>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Your Phone Number"
+                value={form.phone}
+                onChange={handleChange}
+                className={errors.phone ? "invalid" : ""}
+              />
+              {errors.phone && <div className="field-error">{errors.phone}</div>}
+            </div>
+            <div className="form-group">
+              <label>Your Email *</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                value={form.email}
+                onChange={handleChange}
+                className={errors.email ? "invalid" : ""}
+              />
+              {errors.email && <div className="field-error">{errors.email}</div>}
+            </div>
+            <div className="form-group">
+              <label>Your Message *</label>
+              <textarea
+                name="message"
+                rows="4"
+                placeholder="Your Message"
+                value={form.message}
+                onChange={handleChange}
+                className={errors.message ? "invalid" : ""}
+              ></textarea>
+              {errors.message && <div className="field-error">{errors.message}</div>}
+            </div>
+
+            <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+              📨 Send Message
+            </button>
+
+            {status === "success" && (
+              <div className="alert alert-success">
+                ✅ Thank you! Your message has been sent successfully. We'll get back to you as soon as possible.
+              </div>
+            )}
+            {status === "error" && (
+              <div className="alert alert-error">
+                ⚠️ Please fill in all required fields correctly.
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================
+   ROOT APP
+   ============================ */
+function App() {
+  const [page, setPage] = useState("home");
+  // cart shape: { [id]: { ...item, qty } }
+  const [cart, setCart] = useState({});
+
+  function addToCart(item) {
+    setCart((prev) => {
+      const existing = prev[item.id];
+      return {
+        ...prev,
+        [item.id]: existing ? { ...existing, qty: existing.qty + 1 } : { ...item, qty: 1 },
+      };
+    });
+  }
+
+  function updateQty(id, qty) {
+    setCart((prev) => {
+      if (!prev[id]) return prev;
+      return { ...prev, [id]: { ...prev[id], qty } };
+    });
+  }
+
+  function removeItem(id) {
+    setCart((prev) => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
+  }
+
+  const cartCount = Object.values(cart).reduce((sum, i) => sum + i.qty, 0);
+
+  let pageContent;
+  if (page === "home") {
+    pageContent = <Home setPage={setPage} cart={cart} addToCart={addToCart} />;
+  } else if (page === "menu") {
+    pageContent = <Menu setPage={setPage} cart={cart} addToCart={addToCart} />;
+  } else if (page === "order") {
+    pageContent = (
+      <OrderPage
+        setPage={setPage}
+        cart={cart}
+        updateQty={updateQty}
+        removeItem={removeItem}
+      />
+    );
+  } else if (page === "about") {
+    pageContent = <About setPage={setPage} />;
+  } else if (page === "contact") {
+    pageContent = <Contact />;
+  }
+
+  return (
+    <React.Fragment>
+      <Navbar page={page} setPage={setPage} cartCount={cartCount} />
+      {pageContent}
+      <Footer setPage={setPage} />
+    </React.Fragment>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
